@@ -1,8 +1,24 @@
-#!/usr/bin/with-contenv bash
+#!/usr/bin/with-contenv bashio
+
 echo "Starting NetDaemon Runner"
 
 declare runtype="Service"
 declare daemondir="/daemon"
+
+export NETDAEMON__GENERATEENTITIES=$(bashio::config 'generate_entities')
+export HASSCLIENT_MSGLOGLEVEL=$(bashio::config 'log_level')
+export HASS_DISABLE_LOCAL_ASM=$(bashio::config 'disable_local_asm')
+
+if ! $(bashio::config.is_empty 'project_folder') ; then
+    ConfigProjectDir=$(bashio::config 'project_folder')
+    if test -d "${ConfigProjectDir}"; then
+        export NETDAEMON__PROJECTFOLDER="${ConfigProjectDir}"
+        bashio::log.green "Set project folder to ${ConfigProjectDir}"
+    else
+        bashio::log.warning "Project folder in config doesn't exist: ${ConfigProjectDir}" 
+        bashio::log.warning "Check config!" 
+    fi  
+fi
 
 cd "${NETDAEMON__PROJECTFOLDER}" || echo -e "\\033[31mCould not change directory to run project\\033[0m" >&2
 
