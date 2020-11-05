@@ -21,9 +21,15 @@
   "homeassistant_api": true,
   "host_network": false,
   "options": {
-    "log_level": "info"
-  },
+    "log_level": "info",
+    "generate_entities": false,
+    "project_folder": "/usr/src/Service",
+    "disable_local_asm": false
+    },
   "schema": {
-    "log_level": "match(^(trace|debug|info|warning|error)$)"
+    "log_level": "match(^(trace|debug|info|warning|error)$)",
+    "generate_entities": "bool?",
+    "project_folder": "str?",
+    "disable_local_asm": "bool?"
   }
 }
