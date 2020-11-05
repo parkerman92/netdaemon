@@ -27,7 +27,7 @@ namespace NetDaemon.Daemon.Tests
         {
             MockLogger.Verify(
                 x => x.Log(
-                    level,
+                    It.Is<LogLevel>(l => l == level),
                     It.IsAny<EventId>(),
                     It.Is<It.IsAnyType>((v, t) => true),
                     It.IsAny<Exception>(),
