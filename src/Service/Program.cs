@@ -18,9 +18,6 @@ namespace Service
             {
                 Log.Logger = SerilogConfigurator.Configure().CreateLogger();
 
-                if (File.Exists(HassioConfigPath))
-                    await ReadHassioConfig();
-
                 await Host.CreateDefaultBuilder(args)
                     .UseSerilog(Log.Logger)
                     .UseNetDaemon()
@@ -34,33 +31,6 @@ namespace Service
             finally
             {
                 Log.CloseAndFlush();
-            }
-        }
-
-        private static async Task ReadHassioConfig()
-        {
-            try
-            {
-                var hassAddOnSettings = await JsonSerializer.DeserializeAsync<HassioConfig>(File.OpenRead(HassioConfigPath)).ConfigureAwait(false);
-
-                if (hassAddOnSettings.LogLevel is object)
-                    SerilogConfigurator.SetMinimumLogLevel(hassAddOnSettings.LogLevel);
-
-                if (hassAddOnSettings.GenerateEntitiesOnStart is object)
-                    Environment.SetEnvironmentVariable("NETDAEMON__GENERATEENTITIES", hassAddOnSettings.GenerateEntitiesOnStart.ToString());
-
-                if (hassAddOnSettings.LogMessages is object && hassAddOnSettings.LogMessages == true)
-                    Environment.SetEnvironmentVariable("HASSCLIENT_MSGLOGLEVEL", "Default");
-
-                if (hassAddOnSettings.ProjectFolder is object && string.IsNullOrEmpty(hassAddOnSettings.ProjectFolder) == false)
-                    Environment.SetEnvironmentVariable("NETDAEMON__PROJECTFOLDER", hassAddOnSettings.ProjectFolder);
-
-                // We are in Hassio so hard code the path
-                Environment.SetEnvironmentVariable("NETDAEMON__SOURCEFOLDER", "/config/netdaemon");
-            }
-            catch (Exception e)
-            {
-                Log.Fatal(e, "Failed to read the Home Assistant Add-on config");
             }
         }
     }
